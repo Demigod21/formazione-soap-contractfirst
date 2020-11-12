@@ -14,6 +14,9 @@
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
 
+        <skip.formazione.tests>true</skip.formazione.tests>
+
+
         <!-- version of BOM -->
         <version.org.jboss.redhat-fuse>7.6.0.fuse-760027-redhat-00001</version.org.jboss.redhat-fuse>
 
@@ -55,6 +58,18 @@
         <dependency>
             <groupId>org.apache.camel</groupId>
             <artifactId>camel-cxf</artifactId>
+            <scope>provided</scope>
+        </dependency>
+<!--
+        <dependency>
+            <groupId>org.apache.camel</groupId>
+            <artifactId>camel-xstream</artifactId>
+            <scope>provided</scope>
+        </dependency>-->
+
+        <dependency>
+            <groupId>org.apache.camel</groupId>
+            <artifactId>camel-jaxb-starter</artifactId>
             <scope>provided</scope>
         </dependency>
 
@@ -144,6 +159,15 @@
                     <target>1.8</target>
                 </configuration>
             </plugin>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-surefire-plugin</artifactId>
+                <configuration>
+                    <!-- Skip tests by default and enable them only in "qtest" profile -->
+                    <skipTests>${skip.formazione.tests}</skipTests>
+                </configuration>
+            </plugin>
+
 
 
             <!-- CXF plugins -->
@@ -159,7 +183,7 @@
                             <sourceRoot>target/generated/src/main/java</sourceRoot>
                             <wsdlOptions>
                                 <wsdlOption>
-                                    <wsdl>src/main/resources/wsdl/person.wsdl</wsdl>
+                                    <wsdl>src/main/resources/wsdl/order.wsdl</wsdl>
                                     <extraargs>
                                         <extraarg>-impl</extraarg>
                                     </extraargs>
