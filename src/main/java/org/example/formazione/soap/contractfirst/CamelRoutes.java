@@ -1,14 +1,11 @@
 package org.example.formazione.soap.contractfirst;
 
-import org.apache.camel.Exchange;
-import org.apache.camel.Processor;
+
 import org.apache.camel.builder.RouteBuilder;
 import org.apache.camel.builder.xml.XPathBuilder;
-import org.apache.camel.component.cxf.DataFormat;
-import org.apache.camel.model.dataformat.JaxbDataFormat;
+
 
 import java.util.HashMap;
-import java.util.Map;
 
 public class CamelRoutes extends RouteBuilder {
 
@@ -16,16 +13,19 @@ public class CamelRoutes extends RouteBuilder {
     @Override
     public void configure() throws Exception {
 
+        //This is our first endpoint in the Readme, using the Xpath camel component with local names
+        from("cxf:bean:personEndpointXpathComponent")
+                .routeId("cxf:bean:personEndpointXpathComponent")
+                .setHeader("ProvaNome").xpath("//*[local-name()='inputPerson']/firstName/text()", String.class)
+                .log("headers ${headers}")
+                .setBody(constant("OK"))
+                .to("seda:incomingOrders");
 
-
-        from("cxf:bean:personEndpoint")
-                .routeId("cxf:bean:personEndpoint")
+        //This is our second endpoint in the Readme, using java code and XpathBuilder with namespaces
+        from("cxf:bean:personEndpointXpathJava")
+                .routeId("cxf:bean:personEndpointXpathJava")
                 .convertBodyTo(java.lang.String.class)
-                .log("Boody DOPO CONVERT TO STRING ${body}")
                 .process((exchange -> {
-                    String s1 = exchange.getIn().getBody().toString();
-                    exchange.getIn().setHeader("ssss", s1);
-
                     XPathBuilder builder = new XPathBuilder("/soapenv:Envelope/soapenv:Body/con:inputPerson/firstName/text()");
                     HashMap m1 = new HashMap();
                     m1.put("soapenv", "http://schemas.xmlsoap.org/soap/envelope/");
@@ -33,13 +33,21 @@ public class CamelRoutes extends RouteBuilder {
                     builder.setNamespaces(m1);
                     String val = builder.evaluate(exchange, String.class);
                     exchange.getIn().setHeader("ProvaNome", val);
-
                 }))
                 .log("headers ${headers}")
                 .setBody(constant("OK"))
-                .log("Boody DOPO SET CONSTANT ${body}")
                 .convertBodyTo(java.lang.String.class)
                 .to("seda:incomingOrders");
+
+        //This is our third endpoint in the Readme, using a processor and a Pojo instead of a message
+        from("cxf:bean:personEndpointPojo")
+                .routeId("cxf:bean:personEndpointPojo")
+                .process(new ProvaProcessor())
+                .log("headers ${headers}")
+                .setBody(constant("OK"))
+                .convertBodyTo(java.lang.String.class)
+                .to("seda:incomingOrders");
+
 
         from("seda:incomingOrders")
                 .routeId("seda:incomingOrders")

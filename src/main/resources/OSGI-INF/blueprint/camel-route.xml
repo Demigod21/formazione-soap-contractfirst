@@ -24,14 +24,39 @@
              http://camel.apache.org/schema/blueprint/cxf http://camel.apache.org/schema/blueprint/cxf/camel-cxf.xsd
              http://camel.apache.org/schema/blueprint http://camel.apache.org/schema/blueprint/camel-blueprint.xsd">
 
-    <cxf:cxfEndpoint id="personEndpoint"
-                     address="/contract_first_order/"
+
+    <cxf:cxfEndpoint id="personEndpointXpathComponent"
+                     address="/person_xpath_component/"
                      serviceClass="org.example.formazione.soap.contractfirst.PersonEndpoint"
                      wsdlURL="wsdl/order.wsdl">
 
         <cxf:properties>
             <entry key="faultStackTraceEnabled" value="true" />
-            <entry key="dataFormat" value="MESSAGE"/>
+            <entry key="dataFormat" value="MESSAGE"/> <!-- Note : this is important, we're treating like a message and using Xpath to extract the infos -->
+        </cxf:properties>
+
+    </cxf:cxfEndpoint>
+
+    <cxf:cxfEndpoint id="personEndpointXpathJava"
+                     address="/person_xpath_java/"
+                     serviceClass="org.example.formazione.soap.contractfirst.PersonEndpoint"
+                     wsdlURL="wsdl/order.wsdl">
+
+        <cxf:properties>
+            <entry key="faultStackTraceEnabled" value="true" />
+            <entry key="dataFormat" value="MESSAGE"/> <!-- Note : this is important, we're treating like a message and using Xpath to extract the infos -->
+        </cxf:properties>
+
+    </cxf:cxfEndpoint>
+
+    <cxf:cxfEndpoint id="personEndpointPojo"
+                     address="/person_Pojo/"
+                     serviceClass="org.example.formazione.soap.contractfirst.PersonEndpoint"
+                     wsdlURL="wsdl/order.wsdl">
+
+        <cxf:properties>
+            <entry key="faultStackTraceEnabled" value="true" />
+            <entry key="dataFormat" value="POJO"/> <!-- Note : this is important, we're letting CXF know it's a POJO and then using PojoProcessor to let him know that it's a InputPerson Pojo -->
         </cxf:properties>
 
     </cxf:cxfEndpoint>
@@ -46,39 +71,6 @@
 
         <routeBuilder ref="camel-routes" />
 
-      <!--  <dataFormats>
-            <xstream id="xstream-utf8" encoding="UTF-8"/>
-            <xstream id="xstream-default"/>
-        </dataFormats>-->
-
-<!--        <route>
-            <from uri="direct:in"/>
-            <marshal ref="xstream-default"/>
-            <to uri="mock:result"/>
-        </route>
-
-        <route>
-            <from uri="direct:in-UTF-8"/>
-            <marshal ref="xstream-utf8"/>
-            <to uri="mock:result"/>
-        </route>-->
-
-
-<!--        <route>
-            &lt;!&ndash; route starts from the cxf webservice &ndash;&gt;
-            <from uri="cxf:bean:orderEndpoint" />
-            <to uri="seda:incomingOrders" />
-            &lt;!&ndash; and then create the OK reply for the webservice which is still waiting for a reply &ndash;&gt;
-            <transform>
-                <constant>OK</constant>
-            </transform>
-        </route>
-
-        &lt;!&ndash; test route &ndash;&gt;
-        <route>
-            <from uri="seda:incomingOrders" />
-            <to uri="mock:end"/>
-        </route>-->
     </camelContext>
 
 

@@ -1,0 +1,9 @@
+<soapenv:Envelope xmlns:soapenv="http://schemas.xmlsoap.org/soap/envelope/" xmlns:con="http://contractfirst.soap.formazione.example.org">
+    <soapenv:Header/>
+    <soapenv:Body>
+        <con:inputPerson>
+            <firstName>nome</firstName>
+            <lastName>cognome</lastName>
+        </con:inputPerson>
+    </soapenv:Body>
+</soapenv:Envelope>
