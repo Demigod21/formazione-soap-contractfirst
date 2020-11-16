@@ -16,8 +16,8 @@ public class CamelRoutes extends RouteBuilder {
         //This is our first endpoint in the Readme, using the Xpath camel component with local names
         from("cxf:bean:personEndpointXpathComponent")
                 .routeId("cxf:bean:personEndpointXpathComponent")
-                .setHeader("ProvaNome").xpath("//*[local-name()='inputPerson']/firstName/text()", String.class)
-                .log("headers ${headers}")
+                .setHeader("ProvaNome").xpath("//*[local-name()='inputPerson']/firstName/text()", String.class) //Getting the value from xpath and setting it in our header
+                .log("headers ${headers}") //If we look at this log, in particular at the header "ProvaNome", we'll see that it now contains the name specified in our soap request
                 .setBody(constant("OK"))
                 .to("seda:incomingOrders");
 
@@ -27,14 +27,14 @@ public class CamelRoutes extends RouteBuilder {
                 .convertBodyTo(java.lang.String.class)
                 .process((exchange -> {
                     XPathBuilder builder = new XPathBuilder("/soapenv:Envelope/soapenv:Body/con:inputPerson/firstName/text()");
-                    HashMap m1 = new HashMap();
-                    m1.put("soapenv", "http://schemas.xmlsoap.org/soap/envelope/");
-                    m1.put("con", "http://contractfirst.soap.formazione.example.org");
-                    builder.setNamespaces(m1);
-                    String val = builder.evaluate(exchange, String.class);
-                    exchange.getIn().setHeader("ProvaNome", val);
+                    HashMap nameSpacesMap = new HashMap(); //we're creating an hashmap because we need to define the namespaces that are used in the xpath builder, specifically "soapenv" and "con"
+                    nameSpacesMap.put("soapenv", "http://schemas.xmlsoap.org/soap/envelope/");
+                    nameSpacesMap.put("con", "http://contractfirst.soap.formazione.example.org");
+                    builder.setNamespaces(nameSpacesMap); //if we don't add this namespace map, xpath won't know what "soapenv" and "con" are
+                    String val = builder.evaluate(exchange, String.class); //with "text()" we obtain the node, but we only need it's value, so we use EVALUATE
+                    exchange.getIn().setHeader("ProvaNome", val); //Setting our header
                 }))
-                .log("headers ${headers}")
+                .log("headers ${headers}") //If we look at this log, in particular at the header "ProvaNome", we'll see that it now contains the name specified in our soap request
                 .setBody(constant("OK"))
                 .convertBodyTo(java.lang.String.class)
                 .to("seda:incomingOrders");
@@ -42,8 +42,8 @@ public class CamelRoutes extends RouteBuilder {
         //This is our third endpoint in the Readme, using a processor and a Pojo instead of a message
         from("cxf:bean:personEndpointPojo")
                 .routeId("cxf:bean:personEndpointPojo")
-                .process(new ProvaProcessor())
-                .log("headers ${headers}")
+                .process(new PojoProcessor())
+                .log("headers ${headers}") //If we look at this log, in particular at the header "ProvaNome", we'll see that it now contains the name specified in our soap request
                 .setBody(constant("OK"))
                 .convertBodyTo(java.lang.String.class)
                 .to("seda:incomingOrders");

@@ -225,6 +225,18 @@
         </plugins>
     </build>
 
+    <profiles>
+        <profile>
+            <id>qtest</id>
+            <properties>
+                <skip.formazione.tests>false</skip.formazione.tests>
+            </properties>
+            <build>
+                <defaultGoal>verify</defaultGoal>
+            </build>
+        </profile>
+    </profiles>
+
 
 
 </project>
